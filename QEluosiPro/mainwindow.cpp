@@ -290,6 +290,56 @@ bool MainWindow::isCanMove(int newX, int newY)
 }
 
 
+/* 旋转方块 */
+void MainWindow::rotateBlock()
+{
+    /* 定义数组 */
+    int rotateBlock[4][4] = { 0 };
+
+    /* 顺时针旋转90度 */
+    for (int y = 0; y < 4; y++)
+    {
+        for (int x = 0; x < 4; x++)
+        {
+            rotateBlock[x][3 - y] = m_currentShape[y][x];
+        }
+    }
+
+    /* 备份原数组 */
+    int tempBlock[4][4] = { 0 };
+    for (int y = 0; y < 4; y++)
+    {
+        for (int x = 0; x < 4; x++)
+        {
+            tempBlock[y][x] = m_currentShape[y][x];
+        }
+    }
+
+    /* 把旋转之后的数组覆盖当前的数组 */
+    for (int y = 0; y < 4; y++)
+    {
+        for (int x = 0; x < 4; x++)
+        {
+            m_currentShape[y][x] = rotateBlock[y][x];
+        }
+    }
+
+
+    /* 碰撞检测 */
+    if (isCanMove(m_currentX, m_currentY) == false)
+    {
+        /* 回滚 */
+        for (int y = 0; y < 4; y++)
+        {
+            for (int x = 0; x < 4; x++)
+            {
+                m_currentShape[y][x] = tempBlock[y][x];
+            }
+        }
+    }
+}
+
+
 /* 键盘按压事件 */
 void MainWindow::keyPressEvent(QKeyEvent *e)
 {
@@ -312,6 +362,10 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
         }
         break;
     case Qt::Key_Up:
+        {
+            rotateBlock();
+            update();
+        }
         break;
     case Qt::Key_Down:
         if (isCanMove(m_currentX, m_currentY + 1))

@@ -44,6 +44,9 @@ private:
 
     /* 绘制固定的方块 */
     void drawFixedBlock(QPainter & painter);
+
+    /* 旋转方块 */
+    void rotateBlock();
 private:
     Ui::MainWindow *ui;
 
