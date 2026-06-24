@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QTimer>
+#include <QLabel>
 
 
 namespace Ui {
@@ -50,6 +51,11 @@ private:
 
     /* 消除整行 */
     void removeCompleteRows();
+
+    /* 初始化按钮和标签 */
+    void initButtonLabel();
+    /* 显示分数 */
+    void displayScore();
 private:
     Ui::MainWindow *ui;
 
@@ -72,6 +78,11 @@ private:
     QTimer * m_timer;
 
     int m_lastShapeIdx;
+
+    /* 得分 */
+    int m_score;
+    /* 分数标签 */
+    QLabel * m_scoreLabel;
 };
 
 #endif // MAINWINDOW_H

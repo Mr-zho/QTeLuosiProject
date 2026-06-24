@@ -10,6 +10,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     m_timer(new QTimer(this)),
     m_lastShapeIdx(-1),
+    m_scoreLabel(new QLabel(this)),
+    m_score(0),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
@@ -42,6 +44,9 @@ MainWindow::MainWindow(QWidget *parent) :
     /* 信号和槽 */
     m_timer->start(1000);
     connect(m_timer, &QTimer::timeout, this, &MainWindow::handleUpdateDown);
+
+    /* 舒适化按钮和标签 */
+    initButtonLabel();
 }
 
 int SHAPES[7][4][4] =
@@ -103,6 +108,38 @@ int SHAPES[7][4][4] =
     }
 };
 
+/* 显示分数 */
+void MainWindow::displayScore()
+{
+    m_scoreLabel->setText(QString("分数:%1").arg(m_score));
+}
+/* 初始化按钮和标签 */
+void MainWindow::initButtonLabel()
+{
+    m_scoreLabel->move(530, 50);
+    m_scoreLabel->resize(120, 60);
+    m_scoreLabel->setAlignment(Qt::AlignCenter);
+    m_scoreLabel->setStyleSheet(
+                "QLabel {"
+                "    /* 设置背景颜色为淡蓝色 */"
+                "    background-color: #ADD8E6;"
+                "    /* 设置文字颜色为深灰色 */"
+                "    color: #333333;"
+                "    /* 设置边框，宽度为 2px，颜色为灰色，样式为实线 */"
+                "    border: 2px solid #808080;"
+                "    /* 设置边框圆角为 10px */"
+                "    border-radius: 10px;"
+                "    /* 设置内边距为 10px */"
+                "    padding: 10px;"
+                "    /* 设置字体为 Arial，大小为 16px，加粗 */"
+                "    font-family: Arial;"
+                "    font-size: 16px;"
+                "    font-weight: bold;"
+                "}"
+            );
+    displayScore();
+}
+
 /* 放置区域的方格 */
 void MainWindow::placeBlock()
 {
@@ -137,6 +174,7 @@ void MainWindow::drawFixedBlock(QPainter & painter)
 /* 消除整行 */
 void MainWindow::removeCompleteRows()
 {
+    int lineClearCnt = 0;
     for (int y = BOARD_HEIGHT - 1; y >= 0;y--)
     {
         bool isLineFull = true;
@@ -161,12 +199,23 @@ void MainWindow::removeCompleteRows()
                 }
             }
 
+
+            lineClearCnt++;
             /* 需要再次检查当前行 */
             ++y;
         }
 
     }
+
+    /* 根据消除的行数更新分数 */
+    if (lineClearCnt > 0)
+    {
+        m_score += lineClearCnt * 100;
+        displayScore();
+    }
 }
+
+
 
 /* 处理自然下落 */
 void MainWindow::handleUpdateDown()
