@@ -8,6 +8,7 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
+    m_timer(new QTimer(this)),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
@@ -35,6 +36,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     /* 清空活动区域 */
     clearBoard();
+
+
+    /* 信号和槽 */
+    m_timer->start(1000);
+    connect(m_timer, &QTimer::timeout, this, &MainWindow::handleUpdateDown);
 }
 
 int SHAPES[7][4][4] =
@@ -96,7 +102,55 @@ int SHAPES[7][4][4] =
     }
 };
 
+/* 放置区域的方格 */
+void MainWindow::placeBlock()
+{
+    for (int y = 0; y < 4; y++)
+    {
+        for(int x = 0; x < 4; x++)
+        {
+            if (m_currentShape[y][x] == 1)
+            {
+                m_board[m_currentY + y][m_currentX + x] = 1;
+            }
+        }
+    }
+}
 
+/* 绘制固定的方块 */
+void MainWindow::drawFixedBlock(QPainter & painter)
+{
+    for (int y = 0; y < BOARD_HEIGHT; y++)
+    {
+        for(int x = 0; x < BOARD_WIDTH; x++)
+        {
+            if (m_board[y][x] == 1)
+            {
+                painter.fillRect(m_margin + x * 32, m_margin +  y * 32, 32, 32, Qt::blue);
+            }
+        }
+    }
+}
+
+/* 处理自然下落 */
+void MainWindow::handleUpdateDown()
+{
+    if (isCanMove(m_currentX, m_currentY + 1))
+    {
+        m_currentY++;
+    }
+    else
+    {
+        /* 放置方块 */
+        placeBlock();
+
+        /* 创建新的方块 */
+        createBlock();
+    }
+
+    /* 手动触发绘图事件 */
+    update();
+}
 
 
 /* 创建俄罗斯方块 */
@@ -191,8 +245,11 @@ void MainWindow::paintEvent(QPaintEvent *e)
     drawRangeRegion(painter);
     /* 绘制俄罗斯方块 */
     drawActiveBlock(painter);
+    /* 绘制固定方块 */
+    drawFixedBlock(painter);
     /* 绘制网格线 */
     drawGridRegion(painter);
+
 }
 
 /* 清空活动区域所有的方格 */

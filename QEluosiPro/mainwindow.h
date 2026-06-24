@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QTimer>
+
 
 namespace Ui {
 class MainWindow;
@@ -15,6 +17,9 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+public slots:
+    /* 处理自然下落 */
+    void handleUpdateDown();
 protected:
     /* 绘画事件  */
     void paintEvent(QPaintEvent *e) override;
@@ -34,6 +39,11 @@ private:
     bool isCanMove(int newX, int newY);
     /* 清空活动区域所有的方格 */
     void clearBoard();
+    /* 放置区域的方格 */
+    void placeBlock();
+
+    /* 绘制固定的方块 */
+    void drawFixedBlock(QPainter & painter);
 private:
     Ui::MainWindow *ui;
 
@@ -52,6 +62,10 @@ private:
 
     /* 维护区域里面所有的方块 */
     int m_board[20][20];
+
+
+    /* 定时器 */
+    QTimer * m_timer;
 };
 
 #endif // MAINWINDOW_H
