@@ -2,7 +2,8 @@
 #include "ui_mainwindow.h"
 #include <QDebug>
 #include <QPainter>
-
+#include <QTime>
+#include <time.h>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -24,6 +25,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     /* 设置固定大小 */
     setFixedSize(680, 680);
+
+    /* 添加随机数的种子 */
+    srand(time(NULL));
+
+    /* 创建砖块 */
+    createBlock();
 }
 
 int SHAPES[7][4][4] =
@@ -88,7 +95,39 @@ int SHAPES[7][4][4] =
 
 
 
+/* 创建俄罗斯方块 */
+void MainWindow::createBlock()
+{
+    /* 随机数 */
+    int shapeIdx = rand() % 7;
 
+    for (int y = 0; y < 4; y++)
+    {
+        for(int x = 0; x < 4; x++)
+        {
+            m_currentShape[y][x] = SHAPES[shapeIdx][y][x];
+        }
+    }
+
+
+    m_currentX = 6;
+    m_currentY = 0;
+}
+
+/* 绘制移动方块 */
+void MainWindow::drawActiveBlock(QPainter & painter)
+{
+    for (int y = 0; y < 4; y++)
+    {
+        for(int x = 0; x < 4; x++)
+        {
+            if (m_currentShape[y][x] == 1)
+            {
+                painter.fillRect(m_margin + (m_currentX + x) * 32, m_margin + (m_currentY + y) * 32, 32,32, Qt::red);
+            }
+        }
+    }
+}
 
 
 /* 绘制活动区域 */
@@ -146,6 +185,8 @@ void MainWindow::paintEvent(QPaintEvent *e)
 
     /* 绘制活动区域 */
     drawRangeRegion(painter);
+    /* 绘制俄罗斯方块 */
+    drawActiveBlock(painter);
     /* 绘制网格线 */
     drawGridRegion(painter);
 }
