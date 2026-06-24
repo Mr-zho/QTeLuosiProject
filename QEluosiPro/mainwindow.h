@@ -47,6 +47,9 @@ private:
 
     /* 旋转方块 */
     void rotateBlock();
+
+    /* 消除整行 */
+    void removeCompleteRows();
 private:
     Ui::MainWindow *ui;
 

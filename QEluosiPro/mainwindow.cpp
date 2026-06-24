@@ -132,6 +132,41 @@ void MainWindow::drawFixedBlock(QPainter & painter)
     }
 }
 
+
+/* 消除整行 */
+void MainWindow::removeCompleteRows()
+{
+    for (int y = BOARD_HEIGHT - 1; y >= 0;y--)
+    {
+        bool isLineFull = true;
+
+        for (int x = 0; x < BOARD_WIDTH; x++)
+        {
+            if (m_board[y][x] == 0)
+            {
+                isLineFull = false;
+                break;
+            }
+        }
+
+
+        if (isLineFull == true)
+        {
+            for (int aboveY = y; aboveY > 0; aboveY--)
+            {
+                for (int x = 0; x < BOARD_WIDTH;x++)
+                {
+                    m_board[aboveY][x] = m_board[aboveY - 1][x];
+                }
+            }
+
+            /* 需要再次检查当前行 */
+            ++y;
+        }
+
+    }
+}
+
 /* 处理自然下落 */
 void MainWindow::handleUpdateDown()
 {
@@ -143,7 +178,8 @@ void MainWindow::handleUpdateDown()
     {
         /* 放置方块 */
         placeBlock();
-
+        /* 消除整行 */
+        removeCompleteRows();
         /* 创建新的方块 */
         createBlock();
     }
