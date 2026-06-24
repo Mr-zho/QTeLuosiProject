@@ -9,6 +9,7 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     m_timer(new QTimer(this)),
+    m_lastShapeIdx(-1),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
@@ -193,7 +194,13 @@ void MainWindow::handleUpdateDown()
 void MainWindow::createBlock()
 {
     /* 随机数 */
-    int shapeIdx = rand() % 7;
+    int shapeIdx = 0;
+    do
+    {
+        shapeIdx = rand() % 7;
+    } while(m_lastShapeIdx == shapeIdx);
+    /* 更新上一次索引标记 */
+    m_lastShapeIdx = shapeIdx;
 
     for (int y = 0; y < 4; y++)
     {

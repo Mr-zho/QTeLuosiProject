@@ -68,10 +68,10 @@ private:
 
     /* 维护区域里面所有的方块 */
     int m_board[20][20];
-
-
     /* 定时器 */
     QTimer * m_timer;
+
+    int m_lastShapeIdx;
 };
 
 #endif // MAINWINDOW_H
