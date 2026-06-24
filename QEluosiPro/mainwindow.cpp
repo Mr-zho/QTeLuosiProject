@@ -34,15 +34,11 @@ MainWindow::MainWindow(QWidget *parent) :
     /* 添加随机数的种子 */
     srand(time(NULL));
 
-    /* 创建砖块 */
-    createBlock();
-
     /* 清空活动区域 */
     clearBoard();
 
 
     /* 信号和槽 */
-    m_timer->start(1000);
     connect(m_timer, &QTimer::timeout, this, &MainWindow::handleUpdateDown);
 
     /* 舒适化按钮和标签 */
@@ -113,6 +109,75 @@ void MainWindow::displayScore()
 {
     m_scoreLabel->setText(QString("分数:%1").arg(m_score));
 }
+
+
+/* 处理开始游戏按钮 */
+void MainWindow::handleStartSlot()
+{
+    if (m_isGameStarted == false)
+    {
+        /* 启动标志位 */
+        m_isGameStarted = true;
+        /* 暂停标志位 */
+        m_isPaused = false;
+        /* 清空活动区域 */
+        clearBoard();
+        /* 创建砖块 */
+        createBlock();
+        /* 启动定时器 */
+        m_timer->start(1000);
+
+        /* 手动更新 */
+        update();
+        this->setFocus();
+    }
+
+}
+/* 处理重新开始按钮 */
+void MainWindow::handleReStartSlot()
+{
+    /* 启动标志位 */
+    m_isGameStarted = true;
+    /* 暂停标志位 */
+    m_isPaused = false;
+    /* 清空活动区域 */
+    clearBoard();
+    /* 创建砖块 */
+    createBlock();
+    /* 启动定时器 */
+    m_timer->start(1000);
+
+    /* 手动更新 */
+    update();
+    this->setFocus();
+}
+
+/* 处理暂停游戏按钮 */
+void MainWindow::handlePauseSlot()
+{
+    if (m_isGameStarted == false)
+    {
+        return;
+    }
+
+    m_isPaused = !m_isPaused;
+
+    if (m_isPaused == true)
+    {
+        m_pauseBtn->setText("继续游戏");
+        m_timer->stop();
+    }
+    else
+    {
+        m_pauseBtn->setText("暂停游戏");
+        m_timer->start();
+    }
+
+    update();
+    this->setFocus();
+}
+
+
 /* 初始化按钮和标签 */
 void MainWindow::initButtonLabel()
 {
@@ -138,6 +203,75 @@ void MainWindow::initButtonLabel()
                 "}"
             );
     displayScore();
+
+
+
+    /* 开始游戏 */
+    m_startBtn = new QPushButton("开始游戏", this);
+    m_startBtn->move(530, 150);
+    m_startBtn->resize(120, 60);
+    m_startBtn->setStyleSheet("QPushButton {"
+                              "   background-color: rgb(238, 154, 73);" // 按钮的背景颜色
+                              "   border-radius: 10px;"                 // 圆角半径
+                              "   font-size: 16px;"                     // 字体大小
+                              "   font-weight: bold;"                   // 字体加粗
+                              "   font-family: Arial;"                  // 字体类型
+                              "   color: white;"                        // 字体颜色
+                              "}"
+                              "QPushButton:hover {"
+                              "   background-color: rgb(255, 200, 100);" // 鼠标悬浮时的背景颜色
+                              "}"
+                              "QPushButton:pressed {"
+                                      "   background-color: rgb(200, 100, 50);" // 鼠标按下时的背景颜色
+                                      "}"
+                              );
+
+
+
+    m_reStartBtn = new QPushButton("重新开始", this);
+    m_reStartBtn->move(530, 250);
+    m_reStartBtn->resize(120, 60);
+    m_reStartBtn->setStyleSheet("QPushButton {"
+                              "   background-color: rgb(238, 154, 73);" // 按钮的背景颜色
+                              "   border-radius: 10px;"                 // 圆角半径
+                              "   font-size: 16px;"                     // 字体大小
+                              "   font-weight: bold;"                   // 字体加粗
+                              "   font-family: Arial;"                  // 字体类型
+                              "   color: white;"                        // 字体颜色
+                              "}"
+                              "QPushButton:hover {"
+                              "   background-color: rgb(255, 200, 100);" // 鼠标悬浮时的背景颜色
+                              "}"
+                              "QPushButton:pressed {"
+                                      "   background-color: rgb(200, 100, 50);" // 鼠标按下时的背景颜色
+                                      "}"
+                              );
+
+
+
+    m_pauseBtn = new QPushButton("暂停游戏", this);
+    m_pauseBtn->move(530, 350);
+    m_pauseBtn->resize(120, 60);
+    m_pauseBtn->setStyleSheet("QPushButton {"
+                              "   background-color: rgb(238, 154, 73);" // 按钮的背景颜色
+                              "   border-radius: 10px;"                 // 圆角半径
+                              "   font-size: 16px;"                     // 字体大小
+                              "   font-weight: bold;"                   // 字体加粗
+                              "   font-family: Arial;"                  // 字体类型
+                              "   color: white;"                        // 字体颜色
+                              "}"
+                              "QPushButton:hover {"
+                              "   background-color: rgb(255, 200, 100);" // 鼠标悬浮时的背景颜色
+                              "}"
+                              "QPushButton:pressed {"
+                                      "   background-color: rgb(200, 100, 50);" // 鼠标按下时的背景颜色
+                                      "}"
+                              );
+
+    /* 信号和槽 */
+    connect(m_startBtn, &QPushButton::clicked, this, &MainWindow::handleStartSlot);
+    connect(m_reStartBtn, &QPushButton::clicked, this, &MainWindow::handleReStartSlot);
+    connect(m_pauseBtn, &QPushButton::clicked, this, &MainWindow::handlePauseSlot);
 }
 
 /* 放置区域的方格 */
@@ -435,6 +569,11 @@ void MainWindow::rotateBlock()
 /* 键盘按压事件 */
 void MainWindow::keyPressEvent(QKeyEvent *e)
 {
+    if (m_isGameStarted == false || m_isPaused == true)
+    {
+        return;
+    }
+
     switch (e->key())
     {
     case Qt::Key_Left:

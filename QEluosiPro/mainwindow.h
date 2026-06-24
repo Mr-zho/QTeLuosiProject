@@ -4,7 +4,7 @@
 #include <QMainWindow>
 #include <QTimer>
 #include <QLabel>
-
+#include <QPushButton>
 
 namespace Ui {
 class MainWindow;
@@ -21,6 +21,13 @@ public:
 public slots:
     /* 处理自然下落 */
     void handleUpdateDown();
+
+    /* 处理开始游戏按钮 */
+    void handleStartSlot();
+    /* 处理重新开始按钮 */
+    void handleReStartSlot();
+    /* 处理暂停游戏按钮 */
+    void handlePauseSlot();
 protected:
     /* 绘画事件  */
     void paintEvent(QPaintEvent *e) override;
@@ -83,6 +90,19 @@ private:
     int m_score;
     /* 分数标签 */
     QLabel * m_scoreLabel;
+
+    /* 游戏开始的标志位 */
+    bool m_isGameStarted;
+    /* 游戏结束的标志位 */
+    bool m_isGameOver;
+    /* 暂停标志 */
+    bool m_isPaused;
+    /* 开始游戏 */
+    QPushButton * m_startBtn;
+    /* 重新开始游戏 */
+    QPushButton * m_reStartBtn;
+    /* 暂停游戏 */
+    QPushButton * m_pauseBtn;
 };
 
 #endif // MAINWINDOW_H
