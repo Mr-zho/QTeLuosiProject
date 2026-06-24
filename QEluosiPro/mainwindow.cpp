@@ -4,6 +4,7 @@
 #include <QPainter>
 #include <QTime>
 #include <time.h>
+#include <QKeyEvent>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -31,6 +32,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     /* 创建砖块 */
     createBlock();
+
+    /* 清空活动区域 */
+    clearBoard();
 }
 
 int SHAPES[7][4][4] =
@@ -191,6 +195,78 @@ void MainWindow::paintEvent(QPaintEvent *e)
     drawGridRegion(painter);
 }
 
+/* 清空活动区域所有的方格 */
+void MainWindow::clearBoard()
+{
+    for (int y = 0; y < BOARD_HEIGHT; y++)
+    {
+        for (int x = 0; x < BOARD_WIDTH; x++)
+        {
+            m_board[y][x] = 0;
+        }
+    }
+}
+
+/* 判断是否可以移动 */
+bool MainWindow::isCanMove(int newX, int newY)
+{
+    for (int y = 0; y < 4; y++)
+    {
+        for(int x = 0; x < 4; x++)
+        {
+            if (m_currentShape[y][x] == 1)
+            {
+                int boardX = newX + x;
+                int boardY = newY + y;
+
+                if (boardX < 0 || boardX >= BOARD_WIDTH || boardY >= BOARD_HEIGHT ||
+                        (boardY >= 0) && (m_board[boardY][boardX] == 1))
+                {
+                    return false;
+                }
+            }
+        }
+    }
+
+
+    return true;
+}
+
+
+/* 键盘按压事件 */
+void MainWindow::keyPressEvent(QKeyEvent *e)
+{
+    switch (e->key())
+    {
+    case Qt::Key_Left:
+        if (isCanMove(m_currentX - 1, m_currentY))
+        {
+            m_currentX--;
+            /* 手动刷新绘图事件 */
+            update();
+        }
+        break;
+    case Qt::Key_Right:
+        if (isCanMove(m_currentX + 1, m_currentY))
+        {
+            m_currentX++;
+            /* 手动刷新绘图事件 */
+            update();
+        }
+        break;
+    case Qt::Key_Up:
+        break;
+    case Qt::Key_Down:
+        if (isCanMove(m_currentX, m_currentY + 1))
+        {
+            m_currentY++;
+            /* 手动刷新绘图事件 */
+            update();
+        }
+        break;
+    }
+
+}
 
 MainWindow::~MainWindow()
 {
